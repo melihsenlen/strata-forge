@@ -1,6 +1,8 @@
 # Strata Forge
 
-A minimal procedural terrain generation pipeline. It composites fractal noise into heightmaps, converts them into 3D meshes, and drops you into a walkable first-person [Ursina](https://www.ursinaengine.org/) environment.
+A minimal procedural terrain generation pipeline.
+
+It composites fractal noise into heightmaps, converts them into 3D meshes, and drops you into a walkable first-person [Ursina](https://www.ursinaengine.org/) environment.
 
 <img src="noises/fbm.png" alt="FBm noise sample" width="128"> <img src="noises/perlin.png" alt="Perlin noise sample" width="128"> <img src="noises/billow.png" alt="Billow noise sample" width="128"> <img src="noises/ridged.png" alt="Ridged noise sample" width="128">
 
@@ -8,8 +10,8 @@ A minimal procedural terrain generation pipeline. It composites fractal noise in
 
 - Noise presets: Perlin, Simplex, FBm, Billow, Ridged
 - Heightmap to mesh conversion with OBJ export
-- First-person preview using Ursina Engine
-- Jupyter notebook for terrain analysis and visualization
+- First-person mesh preview using Ursina Engine
+- Jupyter notebook for terrain visualization
 
 ## Requirements
 
@@ -19,7 +21,7 @@ A minimal procedural terrain generation pipeline. It composites fractal noise in
 - noise
 - PyYAML
 - Ursina
-- Jupyter (for the notebook)
+- Jupyter
 
 ## Installation
 
@@ -41,6 +43,52 @@ The `noise` package may need to build a wheel on some platforms. The steps below
 
 The wheel build should succeed this time.
 
+## How the Terrain Gets Forged
+
+Terrain here is just a grid of heights. The pipeline fills the grid with noise, rescales it into a fixed range, and stitches the grid into a mesh, a bit like draping a sheet over a field of pegs.
+
+1. **Sample noise.** Every cell of the `width` x `height` grid is sampled at `(x / scale, y / scale)` using the `noise` package. A larger `scale` stretches features out into broader, smoother hills, and a smaller one packs them tighter. The `seed` picks the pattern.
+   
+2. **Apply a preset.**
+   - **Perlin** and **Simplex** are used as they come.
+   - **FBm** stacks `octaves` layers of Perlin noise. Each layer is `lacunarity` times finer and `persistance` times as strong as the one before, so small detail sits on top of broad shapes.
+   - **Billow** and **Ridged** are built from FBm output. Billow takes the absolute value, which gives rounded, puffy hills. Ridged takes 1 minus the absolute value, which flips that into sharp ridge lines.
+
+3. **Normalize.** Heights are rescaled to the 0 to 1 range, so every preset ends up in the same range regardless of noise type.
+   
+4. **Build the mesh.** Each grid cell becomes a vertex at `(x, height * height_scale, y)`, so `height_scale` is the tallest the terrain can get, in world units. Neighboring vertices are 1 unit apart, and every grid square is split into two triangles.
+   
+5. **Color and export.** Each vertex is colored by its height: blue for low ground, then greens, gray rock, and white at the peaks, with a little random variation per vertex. The colors are stored as per-vertex colors in the OBJ file.
+
+## Configuration
+
+Settings live in `config.yaml`. The defaults are a 128x128 FBm terrain with a fixed seed:
+
+```yaml
+terrain:
+  width: 128
+  height: 128
+
+noise:
+  type: "fbm" # fbm | perlin | simplex | billow | ridged
+  seed: 42    # set to 0 for random
+  scale: 25.0
+  height_scale: 15.0
+
+  octaves: 4  # not used for perlin and simplex
+  persistance: 0.5
+  lacunarity: 2.0
+
+output:
+  mesh_dir: "meshes/"
+  mesh_name: "terrain.obj"
+```
+
+- Change `noise.type` to switch presets.
+- A `seed` of `0` picks a random seed between 0 and 99 on each run.
+- `octaves`, `persistance` and `lacunarity` only affect FBm, Billow and Ridged.
+- Both `generate.py` and `render.py` read this file, so re-run `generate.py` after any change.
+
 ## Usage
 
 ### 1. Generate and export a mesh
@@ -57,40 +105,12 @@ This writes an OBJ file to `meshes/`, ready to import into Blender or MeshLab.
 python render.py
 ```
 
-This loads the generated mesh in a minimal Ursina environment so you can walk around it. It's bare-bones, but it's a quick way to see whether the terrain feels right. Run `generate.py` first, since the preview needs the OBJ file to exist.
+This loads the generated mesh in a minimal Ursina environment so you can walk around it. Run `generate.py` first, since the preview needs the OBJ file to exist.
 
-The preview opens fullscreen.
+### 3. Visualize in the notebook
 
-### 3. Inspect in the notebook
-
-Open `analysis.ipynb` for heightmap inspection and 3D terrain visualization.
-
-## Configuration
-
-Settings live in `config.yaml`. The defaults are a 128x128 FBm terrain with a fixed seed:
-
-```yaml
-terrain:
-  width: 128
-  height: 128
-
-noise:
-  type: "fbm"       # fbm | perlin | simplex | billow | ridged
-  seed: 42          # set to 0 for random
-  scale: 25.0
-  height_scale: 15.0
-
-  octaves: 4        # not used for perlin and simplex
-  persistance: 0.5
-  lacunarity: 2.0
-
-output:
-  mesh_dir: "meshes/"
-  mesh_name: "terrain.obj"
-```
-
-Change `noise.type` to switch presets, or set `noise.seed` to `0` for a different terrain each run. Re-run `generate.py` after any change.
+Open `analysis.ipynb` to plot the configured heightmap as a 3D surface, using the same `config.yaml` settings.
 
 ## License
 
-MIT License
+MIT
