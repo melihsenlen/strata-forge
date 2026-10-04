@@ -4,7 +4,7 @@ terrain:
 
 noise:
   type: "fbm" # fbm | perlin | simplex | billow | ridged
-  seed: 42    # set to 0 for random
+  seed: 42    # iykyk ;)
   scale: 25.0
   height_scale: 15.0
 

@@ -61,7 +61,7 @@ Terrain here is just a grid of heights. The pipeline fills the grid with noise, 
 
 ## Configuration
 
-Settings live in `config.yaml`. The defaults are a 128x128 FBm terrain with a fixed seed:
+Settings live in `config.yaml`. The defaults are a 128x128 FBm terrain with a fixed seed (42):
 
 ```yaml
 terrain:
@@ -70,7 +70,7 @@ terrain:
 
 noise:
   type: "fbm" # fbm | perlin | simplex | billow | ridged
-  seed: 42    # set to 0 for random
+  seed: 42    # iykyk ;)
   scale: 25.0
   height_scale: 15.0
 
