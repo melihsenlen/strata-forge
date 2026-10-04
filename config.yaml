@@ -8,7 +8,8 @@ noise:
   scale: 25.0
   height_scale: 15.0
 
-  octaves: 4  # not used for perlin and simplex
+  # not used for perlin and simplex
+  octaves: 4
   persistance: 0.5
   lacunarity: 2.0
 
