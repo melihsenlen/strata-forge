@@ -4,8 +4,7 @@ from noise import pnoise2, snoise2
 
 def _base(seed: int) -> int:
     if seed == 0:
-        seed = np.random.randint(0, 100)
-    np.random.seed(seed)
+        seed = np.random.randint(1, 1e5) # higher gives C-level array overflow
     return seed
 
 def _grid(width: int, height: int, sample) -> np.ndarray:
@@ -15,13 +14,13 @@ def _grid(width: int, height: int, sample) -> np.ndarray:
             hm[y, x] = sample(x, y)
     return hm
 
-def _perlin(width: int, height: int, scale: float, seed: int) -> np.ndarray:
+def _perlin(width: int, height: int, scale: float, seed: int) -> tuple[np.ndarray, int]:
     base = _base(seed)
-    return _grid(width, height, lambda x, y: pnoise2(x / scale, y / scale, base=base))
+    return _grid(width, height, lambda x, y: pnoise2(x / scale, y / scale, base=base)), base
 
-def _simplex(width: int, height: int, scale: float, seed: int) -> np.ndarray:
+def _simplex(width: int, height: int, scale: float, seed: int) -> tuple[np.ndarray, int]:
     base = _base(seed)
-    return _grid(width, height, lambda x, y: snoise2(x / scale, y / scale, base=base))
+    return _grid(width, height, lambda x, y: snoise2(x / scale, y / scale, base=base)), base
 
 def _fbm(
     width: int,
@@ -31,7 +30,7 @@ def _fbm(
     persistence: float,
     lacunarity: float,
     seed: int
-) -> np.ndarray:
+) -> tuple[np.ndarray, int]:
     base = _base(seed)
     return _grid(width, height, lambda x, y: pnoise2(
         x / scale,
@@ -40,7 +39,7 @@ def _fbm(
         persistence=persistence,
         lacunarity=lacunarity,
         base=base
-    ))
+    )), base
 
 # Types that only need (width, height, scale, seed)
 _SIMPLE = {"perlin": _perlin, "simplex": _simplex}
@@ -67,7 +66,7 @@ def select(noise_type: str, c: dict) -> np.ndarray:
             height,
             scale,
             c["noise"]["octaves"],
-            c["noise"]["persistance"],
+            c["noise"]["persistence"],
             c["noise"]["lacunarity"],
             seed
         )

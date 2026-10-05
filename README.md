@@ -55,28 +55,26 @@ Terrain here is just a grid of heights. The pipeline fills the grid with noise, 
 
 3. **Normalize.** Heights are rescaled to the 0 to 1 range, so every preset ends up in the same range regardless of noise type.
    
-4. **Build the mesh.** Each grid cell becomes a vertex at `(x, height * height_scale, y)`, so `height_scale` is the tallest the terrain can get, in world units. Neighboring vertices are 1 unit apart, and every grid square is split into two triangles.
-   
-5. **Color and export.** Each vertex is colored by its height: blue for low ground, then greens, gray rock, and white at the peaks, with a little random variation per vertex. The colors are stored as per-vertex colors in the OBJ file.
+4. **Mesh.** Each grid cell becomes a vertex at `(x, height * height_scale, y)`, so `height_scale` is the tallest the terrain can get, in world units. Neighboring vertices are 1 unit apart, and every grid square is split into two triangles.
 
 ## Configuration
 
-Settings live in `config.yaml`. The defaults are a 128x128 FBm terrain with a fixed seed (42):
+Settings live in `config.yaml`. The defaults are a 512x512 FBm terrain with a fixed seed (42):
 
 ```yaml
 terrain:
-  width: 128
-  height: 128
+  width: 512
+  height: 512
 
 noise:
   type: "fbm" # fbm | perlin | simplex | billow | ridged
   seed: 42    # iykyk ;)
-  scale: 25.0
-  height_scale: 15.0
+  scale: 40.0
+  height_scale: 35.0
 
   # not used for perlin and simplex
-  octaves: 4  
-  persistance: 0.5
+  octaves: 4
+  persistence: 0.5
   lacunarity: 2.0
 
 output:
@@ -86,7 +84,7 @@ output:
 
 > [!TIP]
 > - Change `noise.type` to switch presets.
-> - A `seed` of `0` picks a random seed between 0 and 99 on each run.
+> - Set the `seed` to `0` to pick a random seed between 1 and 100 000 on each run.
 > - `octaves`, `persistance` and `lacunarity` only affect FBm, Billow and Ridged.
 
 ## Usage

@@ -29,13 +29,14 @@ def heightmap_mesh(hm: np.ndarray, height_scale: float) -> tuple[np.ndarray, np.
 def heightmap_color(h, h_min, h_max) -> tuple[float, float, float]:
     t = (h - h_min) / (h_max - h_min + 1e-8)
 
-    if   t < 0.2: return (np.random.uniform(0.15, 0.2), np.random.uniform(0.35, 0.4), np.random.uniform(0.75, 0.8))
-    elif t < 0.3: return (np.random.uniform(0.25, 0.3), np.random.uniform(0.55, 0.6), np.random.uniform(0.35, 0.4))
-    elif t < 0.5: return (np.random.uniform(0.35, 0.4), np.random.uniform(0.65, 0.7), np.random.uniform(0.35, 0.4))
-    elif t < 0.6: return (np.random.uniform(0.35, 0.4), np.random.uniform(0.55, 0.6), np.random.uniform(0.45, 0.5))
-    elif t < 0.8: return (np.random.uniform(0.45, 0.5), np.random.uniform(0.45, 0.5), np.random.uniform(0.55, 0.6))
-    elif t < 0.9: return (np.random.uniform(0.85, 0.9), np.random.uniform(0.85, 0.9), np.random.uniform(0.85, 0.9))
-    else:         return (1.0, 1.0, 1.0)
+    if   t < 0.11: return (0.04, 0.14, 0.36) # deep ocean
+    elif t < 0.19: return (0.16, 0.48, 0.68) # shallows
+    elif t < 0.21: return (0.90, 0.83, 0.62) # beach
+    elif t < 0.34: return (0.80, 0.78, 0.52) # grass
+    elif t < 0.52: return (0.45, 0.65, 0.30) # meadow
+    elif t < 0.64: return (0.20, 0.45, 0.22) # forest
+    elif t < 0.71: return (0.30, 0.30, 0.32) # rock
+    else:          return (0.98, 0.99, 1.00) # snow
 
 def export_obj(vertices: np.ndarray, faces: np.ndarray, path: str) -> None:
     heights = vertices[:, 1]

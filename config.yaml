@@ -1,16 +1,16 @@
 terrain:
-  width: 128
-  height: 128
+  width: 512
+  height: 512
 
 noise:
   type: "fbm" # fbm | perlin | simplex | billow | ridged
   seed: 42    # iykyk ;)
-  scale: 25.0
-  height_scale: 15.0
+  scale: 40.0
+  height_scale: 35.0
 
   # not used for perlin and simplex
   octaves: 4
-  persistance: 0.5
+  persistence: 0.5
   lacunarity: 2.0
 
 output:
