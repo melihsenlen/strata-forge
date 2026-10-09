@@ -26,7 +26,7 @@ Entity(
 )
 
 Text(
-    text='You can jump mid-air.\nPress "esc" to exit.',
+    text='You can jump infinitely.\nPress "esc" to exit.',
     position=window.top_left + Vec2(0.025, -0.025),
     scale=2.5
 )
