@@ -42,33 +42,34 @@ def _fbm(
     )), base
 
 # Types that only need (width, height, scale, seed)
-_SIMPLE = {"perlin": _perlin, "simplex": _simplex}
+PS = {"perlin": _perlin, "simplex": _simplex}
 
 # Types built by post-processing raw fbm output
-_FBM_VARIANTS = {
+FBM = {
     "fbm": lambda hm: hm,
     "billow": np.abs,
     "ridged": lambda hm: 1 - np.abs(hm)
 }
 
-def select(noise_type: str, c: dict) -> np.ndarray:
-    width = c["terrain"]["width"]
-    height = c["terrain"]["height"]
-    scale = c["noise"]["scale"]
-    seed = c["noise"]["seed"]
+def select(config: dict) -> np.ndarray:
+    noise = config["noise"]["type"]
+    width = config["terrain"]["width"]
+    height = config["terrain"]["height"]
+    scale = config["noise"]["scale"]
+    seed = config["noise"]["seed"]
 
-    if noise_type in _SIMPLE:
-        return _SIMPLE[noise_type](width, height, scale, seed)
+    if noise in PS:
+        return PS[noise](width, height, scale, seed)
 
-    if noise_type in _FBM_VARIANTS:
+    if noise in FBM:
         hm = _fbm(
             width,
             height,
             scale,
-            c["noise"]["octaves"],
-            c["noise"]["persistence"],
-            c["noise"]["lacunarity"],
+            config["noise"]["octaves"],
+            config["noise"]["persistence"],
+            config["noise"]["lacunarity"],
             seed
         )
-        return _FBM_VARIANTS[noise_type](hm)
-    raise ValueError(f"Unknown noise: {noise_type}")
+        return FBM[noise](hm)
+    raise ValueError(f"Unknown noise: {noise}")

@@ -4,12 +4,12 @@ from engine.config import load_config, get_mesh
 
 
 config = load_config()
-noise = config["noise"]
 mesh = get_mesh(config)
 
-hm, seed = select(noise["type"], config)
+hm, seed = select(config)
 hm = normalize(hm)
 
+noise = config["noise"]
 vertices, faces = heightmap_mesh(hm, noise["height_scale"])
 
 

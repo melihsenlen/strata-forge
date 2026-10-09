@@ -1,6 +1,6 @@
 # Strata Forge
 
-A minimal procedural terrain generation pipeline that covers the entire run.
+A procedural terrain generation pipeline that covers the entire run.
 
 It composites fractal noise into heightmaps, converts them into 3D meshes, and drops you into a walkable first-person [Ursina](https://www.ursinaengine.org/) environment.
 
@@ -51,7 +51,7 @@ Terrain here is just a grid of heights. The pipeline fills the grid with noise, 
    - **FBm** stacks `octaves` layers of Perlin noise. Each layer is `lacunarity` times finer and `persistance` times as strong as the one before, so small detail sits on top of broad shapes.
    - **Billow** and **Ridged** are built from FBm output. Billow takes the absolute value, which gives rounded, puffy hills. Ridged takes 1 minus the absolute value, which flips that into sharp ridge lines.
 
-3. **Normalize:** Heights are rescaled to the 0 to 1 range, so every preset ends up in the same range regardless of noise type.
+3. **Normalize:** Heights are rescaled to the 0 to 1 range, so every preset ends up in the same range.
    
 4. **Mesh:** Each grid cell becomes a vertex at `(x, height * height_scale, y)`, so `height_scale` is the tallest the terrain can get, in world units. Neighboring vertices are 1 unit apart, and every grid square is split into two triangles.
 
