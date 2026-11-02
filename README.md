@@ -67,8 +67,8 @@ terrain:
 noise:
   type: "fbm" # fbm | perlin | simplex | billow | ridged
   seed: 42    # iykyk ;)
-  scale: 40.0
-  height_scale: 35.0
+  scale: 50.0
+  height_scale: 40.0
 
   # not used for perlin and simplex
   octaves: 4
@@ -78,6 +78,16 @@ noise:
 output:
   mesh_dir: "meshes/"
   mesh_name: "terrain.obj"
+
+cmap: # colors based on height
+  - { start: 0.00, color: [0.04, 0.14, 0.36], name: ocean }
+  - { start: 0.11, color: [0.16, 0.48, 0.68], name: shallows }
+  - { start: 0.15, color: [0.90, 0.83, 0.62], name: beach }
+  - { start: 0.19, color: [0.80, 0.78, 0.52], name: plains }
+  - { start: 0.34, color: [0.45, 0.65, 0.30], name: meadow }
+  - { start: 0.52, color: [0.20, 0.45, 0.22], name: forest }
+  - { start: 0.64, color: [0.30, 0.30, 0.32], name: rock }
+  - { start: 0.71, color: [0.98, 0.99, 1.00], name: snow }
 ```
 
 - Set the `seed` to `0` to pick a random seed between 1 and 100 000 on each run.

@@ -4,14 +4,14 @@ from noise import pnoise2, snoise2
 
 def _base(seed: int) -> int:
     if seed == 0:
-        seed = np.random.randint(1, 1e5) # higher gives C-level array overflow
+        seed = np.random.randint(1, int(1e5)) # Higher gives C-level array overflow
     return seed
 
 def _grid(width: int, height: int, sample) -> np.ndarray:
     hm = np.zeros((height, width), dtype=np.float32)
-    for y in range(height):
-        for x in range(width):
-            hm[y, x] = sample(x, y)
+    for h in range(height):
+        for w in range(width):
+            hm[h, w] = sample(w, h)
     return hm
 
 def _perlin(width: int, height: int, scale: float, seed: int) -> tuple[np.ndarray, int]:
@@ -32,16 +32,15 @@ def _fbm(
     seed: int
 ) -> tuple[np.ndarray, int]:
     base = _base(seed)
-    return _grid(width, height, lambda x, y: pnoise2(
-        x / scale,
-        y / scale,
+    return _grid(width, height, lambda h, w: pnoise2(
+        h / scale,
+        w / scale,
         octaves=octaves,
         persistence=persistence,
         lacunarity=lacunarity,
         base=base
     )), base
 
-# Types that only need (width, height, scale, seed)
 PS = {"perlin": _perlin, "simplex": _simplex}
 
 # Types built by post-processing raw fbm output
@@ -51,25 +50,25 @@ FBM = {
     "ridged": lambda hm: 1 - np.abs(hm)
 }
 
-def select(config: dict) -> np.ndarray:
-    noise = config["noise"]["type"]
-    width = config["terrain"]["width"]
-    height = config["terrain"]["height"]
-    scale = config["noise"]["scale"]
-    seed = config["noise"]["seed"]
+def select(noise: dict, terrain: dict) -> np.ndarray:
+    method = noise["type"]
+    scale  = noise["scale"]
+    seed   = noise["seed"]
+    width  = terrain["width"]
+    height = terrain["height"]
 
-    if noise in PS:
-        return PS[noise](width, height, scale, seed)
+    if method in PS:
+        return PS[method](width, height, scale, seed)
 
-    if noise in FBM:
-        hm = _fbm(
+    if method in FBM:
+        hm, base = _fbm(
             width,
             height,
             scale,
-            config["noise"]["octaves"],
-            config["noise"]["persistence"],
-            config["noise"]["lacunarity"],
+            noise["octaves"],
+            noise["persistence"],
+            noise["lacunarity"],
             seed
         )
-        return FBM[noise](hm)
-    raise ValueError(f"Unknown noise: {noise}")
+        return FBM[method](hm), base
+    raise ValueError(f"Unknown noise: {method}")

@@ -4,10 +4,11 @@ from ursina.prefabs.first_person_controller import FirstPersonController
 from engine.config import load_config, get_mesh
 
 
-config = load_config()
+config  = load_config()
+mesh    = get_mesh(config)
+
 terrain = config["terrain"]
-noise = config["noise"]
-mesh = get_mesh(config)
+noise   = config["noise"]
 
 width, height = int(terrain["width"]), int(terrain["height"])
 scale, height_scale = int(noise["scale"]), int(noise["height_scale"])
@@ -32,14 +33,14 @@ Text(
 )
 
 player = FirstPersonController(
-    position=(Vec3((width / -2), scale*height_scale, (height / 2)))
+    position=(Vec3((width / -2), ((scale*height_scale) / 2), (height / 2)))
 )
 
 player.jump_height = 2*scale
 player.speed = 2*scale
 player.gravity = 2
 
-# Cheesy way to allow the player to jump mid-air
+# Cheesy way to allow jumps mid-air
 original = player.jump
 def air_jump():
     player.grounded = True
